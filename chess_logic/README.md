@@ -1,0 +1,9 @@
+# Chess Logic
+This directory aims to produce an algorithm capable of initializing an interactive virtual chess board which allows the play of legal moves and determines when the game is over and what the result is. This is essentially just a real-life chess board except it knows the rules. This goal is entirely unrelated to the goal of creating an intelligent chess player, though it is an essential step if legal games are to be played between two entities.
+
+This setup will also allow the play of illegal moves (does not explicitly forbid them) though playing an illegal move will immediately result in a loss, which I hope will be an incentive to the neural networks to learn the rules just like any new chess player will make mistakes at first. I'm also doing this because this is the only way I can force every neural network to have the same number of inputs and outputs (64 in, 128 out... it looks at the board and sees 64 squares with or without pieces which, I hope, can be presented in a meaningful way to the networks, and as an output it has to select a piece (1 out of potentially 64) and move it to somewhere else (another 1 out of 64 so 128 total for output)).
+
+Anyways, presented below is an asm diagram for how I'm planning on building this interactive chess board. 
+
+## ASM for Interactive chess board
+![](https://github.com/rmfranz13/MLFD/blob/master/chess_logic/interactive_chess_board.png)
