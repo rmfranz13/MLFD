@@ -1,168 +1,205 @@
 """
 this file is intended to define the rules of a working chess board and
-implement it such that the user can input a move and the computer will
-know whether or not it is legal, also knowing when the game is done
-
-For concise coding all relevant values are held in a single dictionary
-called data_path. The class methods
+implement it such that the user can input any move, defined by specifying
+a starting square and ending square. The board then decides whether the
+move is legal. In the event of an illegal move, the offending side 
+immediately looses. The idea is that the AIs competing will be forced to
+learn the rules though trial-and-error just like a human, as opposed to 
+having the rules hard-wired into the AIs.
 """
+import matplotlib.pyplot as plt
 
 
-class ChessBoard:
-    def __init__(self,board_state,board_history):
-        self.board_state = board_state
-        self.board_history = board_history
+#Helper functions for building game obects
+
+def string_to_coordinate(str_rc):
+    a = str_rc[0]
+    b = str_rc[1]
+    if a == 'a':
+        a = 1
+    elif a == 'b':
+        a = 2
+    elif a == 'c':
+        a = 3
+    elif a == 'd':
+        a = 4
+    elif a == 'e':
+        a = 5
+    elif a == 'f':
+        a = 6
+    elif a == 'g':
+        a = 7
+    elif a == 'h':
+        a = 8
+    else:
+        print("invalid column")
+    x = a
+    y = int(b)
+    return(x,y)
+
+#game object definitions
+
+class Pawn:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position)
         return(None)
 
-    def init_pos(self):
-        self.board_state = [['wr','wn','wb','wq','wk','wb','wn','wr'],
-                            ['wp','wp','wp','wp','wp','wp','wp','wp'],
-                            ['','','','','','','',''],
-                            ['','','','','','','',''],
-                            ['','','','','','','',''],
-                            ['','','','','','','',''],
-                            ['bp','bp','bp','bp','bp','bp','bp','bp'],
-                            ['br','bn','bb','bq','bk','bb','bn','br']]
-        self.board_history = []
-        return(None)
-
-    def square_status(self,position,color):
-        board_state = self.board_state
-        x = position[0]
-        y = position[1]
-        color = color[0]
-        if board_state[x][y] == '':
-            status = "empty"
-        elif board_state[x][y][0] == color:
-            status = "friendly"
+    def find_possible_moves(self):
+        if self.color == 'white':
+            a = 1
+            b = 2
         else:
-            status = "unfriendly"
-        return(status)
+            a = -1
+            b = -2
 
-    def whose_turn(self):
-        board_history = self.board_history
-        if (len(move_history)%2 == 0):
-            to_move = "white"
-        else:
-            to_move = "black"
-        return(to_move)
-
-    def prompt_play(self):
-        print("Press enter to begin")
-        start_prompt = str(input("Type 'quit' to terminate: "))
-        return(start_prompt)
-
-    def update_board_state(self):
-        board_state = self.board_state
-        board_history = self.board_history
-        move_start = list(int(input("Enter starting row,col for the piece you want to move: ")))
-        move_end = list(input(int(("Enter ending row,col for the piece you want to move: "))))
-        board_history.append(str(move_start)+str(move_end))
-        d = {'A':1.,'B':2.,'C':3.,'D':4.,'E':5.,'F':6.,'G':7.,'H':8.}
-        move_start = [d[move_start[0]]-1,move_start[1]-1]
-        move_end = [d[move_end[0]]-1,move_end[1]-1]
-        board_state[move_end[0]][move_end[1]] = board_state[move_start[0]][move_start[1]]
-        self.board_state = board_state
-        self.board_history = board_history
-        return(None)
-
-    def check(self,king_pos,all_possible_second_moves):
-        
-
-    def is_board_state_repeated(self):
-        board_state = self.board_state
-        board_history = self.board_history
-        i = 0
-        i_list = []
-        while i<len(board_history):
-            if (board_state == board_history[i]):
-                i_list.append(i)
-                i+=1
-            else:
-                i+=1
-        return(i_list)  
-        
-    def move_legal(self):
-        board_history = self.board_history
-        return(legal)
-
-    
-
-class Pawn(ChessBoard):
-    def __init__(self,pawn_position,pawn_color,pawn_history):
-        self.pawn_position = pawn_position
-        self.pawn_color = pawn_color
-        self.pawn_history = pawn_history
-        return(None)
-
-    def possible_moves(self):
-        pawn_position = self.pawn_position
-        pawn_history = self.pawn_history
-        pawn_color = self.pawn_color
-        x = pawn_position[0]
-        y = pawn_position[1]
-        if pawn_color == "white":
-            if len(pawn_history)!=0:
-                moves = [[x,y+1],[x-1,y+1],[x+1,y+1]]
-            else:
-                moves = [[x,y+1],[x,y+2],[x-1,y+1],[x+1,y+1]]
-        elif pawn_color == "black":
-            if len(pawn_history)!=0:
-                moves = [[x,y-1],[x-1,y-1],[x+1,y-1]]
-            else:
-                moves = [[x,y-1],[x,y-2],[x-1,y-1],[x+1,y-1]]
-        else:
-            print("Error: pawn color must either be 'white' or 'black'")
-            moves = None
+        move1 = [self.position[0],self.position[1]+a]
+        move2 = [self.position[0],self.position[1]+b]
+        move3 = [self.position[0]-1,self.position[1]+a]
+        move4 = [self.position[0]+1,self.position[1]+a]
+        dummy = [move1,move2,move3,move4]
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
         return(moves)
 
-    def legal_moves(self):
-        board_state = self.board_state
-        position = self.position
-        history = self.history
-        color = self.color
-        x = position[0]
-        y = position[1]
-        moves = self.possible_moves()
-        test_squares = [ChessBoard.square_status(i,color) for i in moves]
-                
-        
-    
-
-        
-class ChessGame(ChessBoard):
-    def __init__(self,current_state,next_state,inputs):
-        self.current_state = current_state
-        self.next_state = next_state
-        self.inputs = inputs
+class King:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position) 
         return(None)
 
-    def terminate_program(self):
-        print("Program safetly terminated")
-        exit()
+    def find_possible_moves(self):
+        move1 = [self.position[0]+1,self.position[1]+1]
+        move2 = [self.position[0]+1,self.position[1]]
+        move3 = [self.position[0]+1,self.position[1]-1]
+        move4 = [self.position[0],self.position[1]-1]
+        move5 = [self.position[0]-1,self.position[1]-1]
+        move6 = [self.position[0]-1,self.position[1]]
+        move7 = [self.position[0]-1,self.position[1]+1]
+        move8 = [self.position[0],self.position[1]+1]
+        dummy = [move1,move2,move3,move4,move5,move6,move7,move8]
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
+        return(moves)
+
+class Rook:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position)
+        return(None) 
+
+    def find_possible_moves(self):
+        dummy = []
+        for i in range(7):
+            dummy.append([self.position[0]+i+1,self.position[1]])
+            dummy.append([self.position[0]-i-1,self.position[1]])
+            dummy.append([self.position[0],self.position[1]+i+1])
+            dummy.append([self.position[0],self.position[1]-i-1])
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
+        return(moves)
+
+class Bishop:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position)
         return(None)
 
-    def state0(self):
-        self.prompt_play()
+    def find_possible_moves(self):
+        dummy = []
+        for i in range(7):
+            dummy.append([self.position[0]+i+1,self.position[1]+i+1])
+            dummy.append([self.position[0]+i+1,self.position[1]-i-1])
+            dummy.append([self.position[0]-i-1,self.position[1]-i-1])
+            dummy.append([self.position[0]-i-1,self.position[1]+i+1])
+
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
+        return(moves)
+
+class Queen:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position)
         return(None)
 
-    def function_logic(self,current_state):
+    def find_possible_moves(self):
+        dummy = [] 
+        for i in range(7):
+            dummy.append([self.position[0]+i+1,self.position[1]])
+            dummy.append([self.position[0]-i-1,self.position[1]])
+            dummy.append([self.position[0],self.position[1]+i+1])
+            dummy.append([self.position[0],self.position[1]-i-1])
+            dummy.append([self.position[0]+i+1,self.position[1]+i+1])
+            dummy.append([self.position[0]+i+1,self.position[1]-i-1])
+            dummy.append([self.position[0]-i-1,self.position[1]-i-1])
+            dummy.append([self.position[0]-i-1,self.position[1]+i+1])
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
         return(None)
 
-    def next_state_logic(self,current_state,inputs):
-        return(next_state)
+class Knight:
+    def __init__(self, color, position):
+        self.color = color
+        self.position = string_to_coordinate(position)
+        return(None)
 
-    def loop(self):
-        self.current_state = 0
-        while True:
-            self.function_logic(self.current_state)
-            self.next_state = self.next_state_logic(self.current_state,self.inputs)
-            self.current_state = self.next_state
+    def find_possible_moves(self):
+        move1 = [self.position[0]+1,self.position[1]+2]
+        move2 = [self.position[0]+2,self.position[1]+1]
+        move3 = [self.position[0]+2,self.position[1]-1]
+        move4 = [self.position[0]+1,self.position[1]-2]
+        move5 = [self.position[0]-1,self.position[1]-2]
+        move6 = [self.position[0]-2,self.position[1]-1]
+        move7 = [self.position[0]-2,self.position[1]+1]
+        move8 = [self.position[0]-1,self.position[1]+2]
+        dummy = [move1,move2,move3,move4,move5,move6,move7,move8]
+        moves = []
+        for i in dummy:
+            if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
+                moves.append(i)
+        self.possible_moves = moves
+        return(moves)
 
 
+# Helper functions for game logic
 
+def coordinate_to_string(x,y):
+    letters = ['a','b','c','d','e','f','g','h']
+    a = letters[x]
+    b = str(y)
+    str_rc = a+b
+    return(str_rc)
 
-
+position = 'g5'
+king1 = King('white',position)
+possible_moves = king1.find_possible_moves()
+x_list = []
+y_list = []
+for i in possible_moves:
+    x_list.append(i[0])
+    y_list.append(i[1])
+x_list.append(string_to_coordinate(position)[0])
+y_list.append(string_to_coordinate(position)[0])
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.scatter(x_list,y_list)
+plt.show()
 
 
 
