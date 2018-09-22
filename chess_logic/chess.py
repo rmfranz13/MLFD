@@ -151,7 +151,7 @@ class Queen:
             if (i[0]>=1 and i[0]<=8 and i[1]>=1 and i[1]<=8):
                 moves.append(i)
         self.possible_moves = moves
-        return(None)
+        return(moves)
 
 class Knight:
     def __init__(self, color, position):
@@ -186,16 +186,14 @@ def coordinate_to_string(x,y):
     str_rc = a+b
     return(str_rc)
 
-position = 'g5'
-king1 = King('white',position)
-possible_moves = king1.find_possible_moves()
+position = 'f6'
+queen = Queen('white',position)
+possible_moves = queen.find_possible_moves()
 x_list = []
 y_list = []
 for i in possible_moves:
     x_list.append(i[0])
     y_list.append(i[1])
-x_list.append(string_to_coordinate(position)[0])
-y_list.append(string_to_coordinate(position)[0])
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(x_list,y_list)
